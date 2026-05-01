@@ -49,8 +49,7 @@ INSTALLED_APPS = [
     "apps.files",
     "apps.dashboard",
     "apps.settings_panel",
-    "apps.features",
-    "apps.techstacks",
+    
     "apps.projects",
 ]
 
