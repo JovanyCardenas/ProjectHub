@@ -11,7 +11,6 @@
   {% block head %}{% endblock %}
 </head>
 <body class="min-h-screen flex flex-col bg-gray-50 text-gray-900">
-
   {% if user.is_authenticated %}
     {% include "partials/_navbar.html" %}
   {% endif %}
@@ -22,7 +21,7 @@
         {% include "partials/_sidebar.html" %}
       {% endif %}
 
-      <section class="min-w-0 flex-1">
+      <section id="mainContent" class="min-w-0 flex-1">
         {% include "partials/_messages.html" %}
         {% block content %}{% endblock %}
       </section>
@@ -30,6 +29,35 @@
   </main>
 
   {% include "partials/_footer.html" %}
+  <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const sidebar = document.getElementById("sidebar");
+    const toggle = document.getElementById("sidebarToggle");
+
+    if (!sidebar || !toggle) return;
+
+    const savedState = localStorage.getItem("sidebar-hidden");
+
+    if (savedState === "true") {
+      sidebar.classList.add("lg:hidden");
+      sidebar.classList.remove("lg:block");
+    }
+
+    toggle.addEventListener("click", function () {
+      const isHidden = sidebar.classList.contains("lg:hidden");
+
+      if (isHidden) {
+        sidebar.classList.remove("lg:hidden");
+        sidebar.classList.add("lg:block");
+        localStorage.setItem("sidebar-hidden", "false");
+      } else {
+        sidebar.classList.add("lg:hidden");
+        sidebar.classList.remove("lg:block");
+        localStorage.setItem("sidebar-hidden", "true");
+      }
+    });
+  });
+</script>
   {% block scripts %}{% endblock %}
 </body>
 </html>

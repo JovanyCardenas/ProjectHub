@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="mx-auto max-w-4xl px-6 py-10">
+
+  <!-- Breadcrumb / Header -->
+  <div class="mb-6">
+    <p class="text-sm text-gray-500">
+      <a href="{% url 'projects:project_list' %}" class="hover:text-blue-600">Projects</a>
+      <span class="mx-2">/</span>
+      <span class="text-blue-600">{{ title }}</span>
+    </p>
+
+    <h1 class="mt-4 text-3xl font-bold text-gray-900">{{ title }}</h1>
+    <p class="mt-1 text-lg text-gray-600">
+      Add a new technology to use across your projects.
+    </p>
+  </div>
+
+  <!-- Form Card -->
+  <form method="post"
+        class="overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-xl shadow-blue-100/40">
+    {% csrf_token %}
+
+    <!-- Card Header -->
+    <div class="border-b border-gray-200 bg-gradient-to-r from-blue-50 to-white p-6">
+      <h2 class="text-xl font-semibold text-gray-900">Technology Details</h2>
+      <p class="mt-1 text-sm text-gray-600">
+        Define reusable technologies like frameworks, tools, or services.
+      </p>
+    </div>
+
+    <!-- Form Body -->
+    <div class="space-y-6 p-6">
+
+      <!-- Name -->
+      <div>
+        <label class="mb-2 block text-sm font-semibold text-gray-700">
+          Technology Name <span class="text-red-500">*</span>
+        </label>
+        {{ form.name }}
+        {% if form.name.errors %}
+          <p class="mt-1 text-sm text-red-600">{{ form.name.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <!-- Type -->
+      <div>
+        <label class="mb-2 block text-sm font-semibold text-gray-700">
+          Technology Type <span class="text-red-500">*</span>
+        </label>
+        {{ form.tech_type }}
+        {% if form.tech_type.errors %}
+          <p class="mt-1 text-sm text-red-600">{{ form.tech_type.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+      <!-- Website -->
+      <div>
+        <label class="mb-2 block text-sm font-semibold text-gray-700">
+          Website URL
+        </label>
+        {{ form.website_url }}
+        {% if form.website_url.errors %}
+          <p class="mt-1 text-sm text-red-600">{{ form.website_url.errors.0 }}</p>
+        {% endif %}
+      </div>
+
+    </div>
+
+    <!-- Footer Buttons -->
+    <div class="flex items-center justify-end gap-3 border-t border-gray-200 bg-gray-50 px-6 py-4">
+
+      <a href="{% url 'projects:project_list' %}"
+         class="rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-100">
+        Cancel
+      </a>
+
+      <button type="submit"
+              class="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700">
+        Save Technology
+      </button>
+
+    </div>
+  </form>
+
+</div>
+{% endblock %}

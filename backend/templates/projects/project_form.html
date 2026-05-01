@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="mx-auto max-w-5xl px-6 py-10">
+
+  <div class="mb-6">
+    <p class="text-sm text-gray-500">
+      <a href="{% url 'projects:project_list' %}" class="hover:text-blue-600">Projects</a>
+      <span class="mx-2">/</span>
+      <span class="text-blue-600">{{ title }}</span>
+    </p>
+
+    <h1 class="mt-4 text-3xl font-bold text-gray-900">{{ title }}</h1>
+    <p class="mt-1 text-lg text-gray-600">Add project details, links, and planning info.</p>
+  </div>
+
+  <form method="post" class="overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-xl shadow-blue-100/40">
+    {% csrf_token %}
+
+    <div class="border-b border-gray-200 bg-gradient-to-r from-blue-50 to-white p-6">
+      <h2 class="text-xl font-semibold text-gray-900">Project Details</h2>
+      <p class="mt-1 text-sm text-gray-600">Track the basic information for this project.</p>
+    </div>
+
+    <div class="space-y-6 p-6">
+
+      <div>
+        <label class="mb-2 block text-sm font-semibold text-gray-700">Project Name</label>
+        {{ form.name }}
+      </div>
+
+      <div>
+        <label class="mb-2 block text-sm font-semibold text-gray-700">Description</label>
+        {{ form.description }}
+      </div>
+
+      <div class="grid gap-6 md:grid-cols-3">
+        <div>
+          <label class="mb-2 block text-sm font-semibold text-gray-700">Status</label>
+          {{ form.status }}
+        </div>
+
+        <div>
+          <label class="mb-2 block text-sm font-semibold text-gray-700">Priority</label>
+          {{ form.priority }}
+        </div>
+
+        <div>
+          <label class="mb-2 block text-sm font-semibold text-gray-700">Category</label>
+          {{ form.category }}
+        </div>
+      </div>
+
+      <div class="grid gap-6 md:grid-cols-3">
+        <div>
+          <label class="mb-2 block text-sm font-semibold text-gray-700">GitHub URL</label>
+          {{ form.github_url }}
+        </div>
+
+        <div>
+          <label class="mb-2 block text-sm font-semibold text-gray-700">Live URL</label>
+          {{ form.live_url }}
+        </div>
+
+        <div>
+          <label class="mb-2 block text-sm font-semibold text-gray-700">Docs URL</label>
+          {{ form.docs_url }}
+        </div>
+      </div>
+
+      <div class="grid gap-6 md:grid-cols-2">
+        <div>
+          <label class="mb-2 block text-sm font-semibold text-gray-700">Start Date</label>
+          {{ form.start_date }}
+        </div>
+
+        <div>
+          <label class="mb-2 block text-sm font-semibold text-gray-700">Target Launch Date</label>
+          {{ form.target_launch_date }}
+        </div>
+      </div>
+
+    </div>
+
+    <div class="flex items-center justify-end gap-3 border-t border-gray-200 bg-gray-50 px-6 py-4">
+      <a href="{% url 'projects:project_list' %}"
+         class="rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-100">
+        Cancel
+      </a>
+
+      <button type="submit"
+              class="rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700">
+        Save Project
+      </button>
+    </div>
+  </form>
+
+</div>
+{% endblock %}

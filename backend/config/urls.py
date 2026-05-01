@@ -11,6 +11,7 @@ handler404 = "config.views.custom_404"
 urlpatterns = [
     path("admin/", admin.site.urls),
 
+    path("projects/", include("apps.projects.urls")),
     path("accounts/", include("apps.accounts.urls")),
     path("tenants/", include("apps.tenants.urls")),
     path("audit/", include("apps.auditlog.urls")),

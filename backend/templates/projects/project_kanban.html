@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="mx-auto max-w-7xl px-6 py-10">
+
+  <div class="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div>
+      <p class="text-sm text-gray-500">
+        <a href="{% url 'projects:project_list' %}" class="hover:text-blue-600">Projects</a>
+        <span class="mx-2">/</span>
+        <a href="{% url 'projects:project_detail' project.pk %}" class="hover:text-blue-600">{{ project.name }}</a>
+        <span class="mx-2">/</span>
+        <span class="text-blue-600">Kanban</span>
+      </p>
+
+      <h1 class="mt-3 text-3xl font-bold text-gray-900">{{ project.name }} Kanban</h1>
+      <p class="text-gray-600">Move features between stages.</p>
+    </div>
+
+    <div class="flex gap-2">
+      <a href="{% url 'projects:feature_create' project.pk %}"
+         class="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700">
+        Add Feature
+      </a>
+
+      <a href="{% url 'projects:project_detail' project.pk %}"
+         class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100">
+        Back
+      </a>
+    </div>
+  </div>
+
+  <div class="grid gap-4 lg:grid-cols-5">
+    {% for status, items in columns.items %}
+      <div class="rounded-2xl border border-gray-200 bg-gray-50 p-3">
+        <div class="mb-3 flex items-center justify-between">
+          <h2 class="text-sm font-bold uppercase tracking-wide text-gray-600">
+            {{ status|title }}
+          </h2>
+
+          <span class="kanban-count rounded-full bg-white px-2 py-1 text-xs font-semibold text-gray-600">
+            {{ items|length }}
+          </span>
+          
+        </div>
+
+        <form method="post"
+      action="{% url 'projects:feature_quick_create' project.pk %}"
+      class="mb-3">
+  {% csrf_token %}
+
+  <input type="hidden" name="status" value="{{ status }}">
+
+  <div class="space-y-2">
+    <input type="text"
+           name="title"
+           placeholder="Add feature..."
+           class="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20">
+
+    <button type="submit"
+            class="w-full rounded-lg bg-white px-3 py-2 text-xs font-semibold text-gray-700 ring-1 ring-gray-300 hover:bg-gray-100">
+      + Add
+    </button>
+  </div>
+</form>
+
+        <div class="kanban-column min-h-96 space-y-3"
+             data-status="{{ status }}">
+
+          {% for feature in items %}
+            <div class="kanban-card cursor-grab rounded-xl border border-gray-200 bg-white p-4 shadow-sm hover:shadow-md"
+                 data-feature-id="{{ feature.pk }}">
+
+              <p class="font-semibold text-gray-900">{{ feature.title }}</p>
+
+              {% if feature.description %}
+                <p class="mt-1 text-xs text-gray-500">
+                  {{ feature.description|truncatewords:14 }}
+                </p>
+              {% endif %}
+
+              <div class="mt-3 flex flex-wrap gap-2">
+                <span class="rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700">
+                  {{ feature.get_priority_display }}
+                </span>
+
+                <span class="rounded-full bg-purple-50 px-2 py-1 text-xs font-medium text-purple-700">
+                  {{ feature.get_difficulty_display }}
+                </span>
+              </div>
+
+              <div class="mt-3 flex gap-2">
+                <a href="{% url 'projects:feature_update' project.pk feature.pk %}"
+                   class="text-xs font-semibold text-blue-600 hover:text-blue-700">
+                  Edit
+                </a>
+
+                {% if feature.github_issue_url %}
+                  <a href="{{ feature.github_issue_url }}" target="_blank"
+                     class="text-xs font-semibold text-gray-600 hover:text-gray-800">
+                    GitHub #{{ feature.github_issue_number }}
+                  </a>
+                {% endif %}
+              </div>
+            </div>
+          {% endfor %}
+
+          <div class="kanban-empty {% if items %}hidden{% endif %} rounded-xl border border-dashed border-gray-300 p-4 text-center text-xs text-gray-400">
+            Drop cards here
+          </div>
+
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+
+<script>
+  function getCookie(name) {
+    const cookies = document.cookie ? document.cookie.split(";") : [];
+
+    for (let cookie of cookies) {
+      cookie = cookie.trim();
+
+      if (cookie.startsWith(name + "=")) {
+        return decodeURIComponent(cookie.substring(name.length + 1));
+      }
+    }
+
+    return null;
+  }
+
+  function updateEmptyStates() {
+    document.querySelectorAll(".kanban-column").forEach((column) => {
+      const cards = column.querySelectorAll(".kanban-card");
+      const emptyState = column.querySelector(".kanban-empty");
+
+      if (!emptyState) return;
+
+      if (cards.length === 0) {
+        emptyState.classList.remove("hidden");
+      } else {
+        emptyState.classList.add("hidden");
+      }
+    });
+  }
+
+  function updateColumnCounts() {
+    document.querySelectorAll(".kanban-column").forEach((column) => {
+      const cards = column.querySelectorAll(".kanban-card");
+      const countBadge = column
+        .closest(".rounded-2xl")
+        .querySelector(".kanban-count");
+
+      if (countBadge) {
+        countBadge.textContent = cards.length;
+      }
+    });
+  }
+
+  const csrftoken = getCookie("csrftoken");
+
+  document.querySelectorAll(".kanban-column").forEach((column) => {
+    new Sortable(column, {
+      group: "features",
+      animation: 150,
+      ghostClass: "opacity-50",
+      draggable: ".kanban-card",
+
+      onEnd: function (event) {
+        const featureId = event.item.dataset.featureId;
+        const newStatus = event.to.dataset.status;
+
+        updateEmptyStates();
+        updateColumnCounts();
+
+        const updates = [];
+
+        document.querySelectorAll(".kanban-column").forEach((column) => {
+        const status = column.dataset.status;
+
+        column.querySelectorAll(".kanban-card").forEach((card, index) => {
+            updates.push({
+            id: card.dataset.featureId,
+            status: status,
+            sort_order: index,
+            });
+        });
+        });
+
+        fetch(`/projects/{{ project.pk }}/features/reorder/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": csrftoken,
+        },
+        body: JSON.stringify({
+            updates: updates,
+        }),
+        });
+      },
+    });
+  });
+
+  updateEmptyStates();
+  updateColumnCounts();
+</script>
+{% endblock %}

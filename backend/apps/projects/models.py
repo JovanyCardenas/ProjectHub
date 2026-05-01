@@ -154,14 +154,23 @@ class Feature(models.Model):
         choices=Difficulty.choices,
         default=Difficulty.UNKNOWN,
     )
+    sort_order = models.PositiveIntegerField(default=0)
 
     github_issue_url = models.URLField(blank=True)
+
+    github_issue_number = models.PositiveIntegerField(null=True, blank=True)
+    github_issue_id = models.BigIntegerField(null=True, blank=True)
+    github_issue_state = models.CharField(max_length=20, blank=True)
+    github_issue_url = models.URLField(blank=True)
+
+    github_last_synced_at = models.DateTimeField(null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["status", "-priority", "title"]
+        ordering = ["status", "sort_order", "-updated_at"]
+        unique_together = ["project", "github_issue_number"]
 
     def __str__(self):
         return self.title
